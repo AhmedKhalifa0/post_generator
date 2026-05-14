@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2522">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Pink Piece — Post Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600&family=Reem+Kufi:wght@500;600&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bone: #F4EDE5;
+    --ivory: #FAF6F1;
+    --paper: #EFE7DD;
+    --blush: #FBE3E5;
+    --rose: #F0B6BE;
+    --deep-rose: #D87F8E;
+    --plum: #6B3E48;
+    --mocha: #8C7565;
+    --charcoal: #1F1A18;
+    --ink: #2A2522;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans:  'DM Sans', system-ui, sans-serif;
+    --arabic:'Reem Kufi', 'Noto Naskh Arabic', sans-serif;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; background: #2A2522; color: var(--charcoal); font-family: var(--sans);
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap { max-width: 1480px; margin: 0 auto; padding: 60px 40px 100px; }
+  header { color: var(--ivory); margin-bottom: 56px; padding-bottom: 30px; border-bottom: 1px solid rgba(244,237,229,0.18); }
+  .eyebrow { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 16px; }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: 64px; line-height: 1; letter-spacing: -0.02em; margin: 0 0 14px; color: var(--ivory); }
+  h1 em { color: var(--rose); font-style: italic; }
+  .sub { font-size: 16px; color: rgba(244,237,229,0.7); max-width: 60ch; line-height: 1.6; margin: 0 0 22px; }
+  .topnav { display: flex; gap: 22px; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; }
+  .topnav a { color: rgba(244,237,229,0.55); text-decoration: none; padding-bottom: 4px; border-bottom: 1px solid rgba(244,237,229,0.18); }
+  .topnav a.active { color: var(--rose); border-bottom-color: var(--rose); }
+  .topnav a:hover { color: var(--ivory); }
+
+  .app { display: grid; grid-template-columns: 360px 1fr; gap: 64px; align-items: start; }
+
+  /* ── Form ─────────────────────────────────────── */
+  .controls { color: var(--ivory); }
+  .controls fieldset {
+    border: 0; padding: 0 0 24px; margin: 0 0 26px;
+    border-bottom: 1px solid rgba(244,237,229,0.12);
+  }
+  .controls fieldset:last-of-type { border-bottom: 0; }
+  .controls legend { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--rose); margin-bottom: 16px; padding: 0; }
+  .controls .field { display: block; margin-bottom: 14px; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(244,237,229,0.55); }
+  .controls .field:last-child { margin-bottom: 0; }
+  .controls .field .hint { color: rgba(244,237,229,0.32); margin-left: 6px; text-transform: none; letter-spacing: 0.04em; font-size: 10px; }
+  .controls input[type=text], .controls input[type=number] {
+    display: block; width: 100%; margin-top: 7px; padding: 11px 12px;
+    background: rgba(244,237,229,0.05); border: 1px solid rgba(244,237,229,0.15);
+    border-radius: 4px; color: var(--ivory);
+    font-family: var(--sans); font-size: 14px; letter-spacing: 0; text-transform: none;
+    -webkit-appearance: none; appearance: none;
+  }
+  /* Hide number-input spinners (Safari/Chrome have a webkit pseudo) so the
+     field stays visually consistent with the text inputs. */
+  .controls input[type=number]::-webkit-outer-spin-button,
+  .controls input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  .controls input[type=number] { -moz-appearance: textfield; }
+  .controls input[dir=rtl] { font-family: var(--arabic); font-size: 16px; }
+  .controls input:focus { outline: 0; border-color: var(--rose); background: rgba(244,237,229,0.09); }
+
+  .t-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .t-card { position: relative; cursor: pointer; padding: 10px 6px 12px; border: 1px solid rgba(244,237,229,0.15); border-radius: 4px; text-align: center; background: rgba(244,237,229,0.04); }
+  .t-card input { position: absolute; opacity: 0; pointer-events: none; }
+  .t-card .sw { width: 100%; height: 36px; border-radius: 3px; margin-bottom: 8px; border: 1px solid rgba(244,237,229,0.1); }
+  .t-card .nm { font-family: var(--serif); font-size: 18px; color: var(--ivory); display: block; line-height: 1.1; }
+  .t-card .desc { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(244,237,229,0.5); margin-top: 4px; display: block; }
+  .t-card:hover { border-color: rgba(244,237,229,0.3); }
+  .t-card:has(input:checked),
+  .t-card.is-checked { border-color: var(--rose); background: rgba(240,182,190,0.08); box-shadow: 0 0 0 1px var(--rose) inset; }
+
+  .drop { position: relative; display: flex; align-items: center; justify-content: center;
+    height: 140px; background: rgba(244,237,229,0.04);
+    border: 1px dashed rgba(244,237,229,0.25); border-radius: 4px;
+    cursor: pointer; overflow: hidden;
+  }
+  .drop.over { border-color: var(--rose); background: rgba(240,182,190,0.08); }
+  .drop .hint { font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(244,237,229,0.5); text-align: center; padding: 0 12px; }
+  .drop .hint b { color: var(--rose); font-weight: 500; }
+  .drop .hint .touch { display: none; }
+  /* On touch devices (no hover, coarse pointer) show "Tap to add photo" since
+     drag-drop doesn't work from a finger. */
+  @media (hover: none) and (pointer: coarse) {
+    .drop .hint .desktop { display: none; }
+    .drop .hint .touch { display: inline; }
+  }
+  .drop img {
+    position: absolute; inset: 0; margin: auto;
+    max-width: 100%; max-height: 100%; object-fit: contain;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none; pointer-events: none;
+  }
+  .drop.filled .hint { display: none; }
+  .drop .clear { position: absolute; top: 6px; right: 6px; background: rgba(31,26,24,0.85); color: var(--ivory); border: 0; cursor: pointer;
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 9px; border-radius: 100px; display: none; }
+  .drop.filled .clear { display: block; }
+
+  .actions { display: flex; flex-direction: column; gap: 9px; margin-top: 6px; }
+  .actions button {
+    -webkit-appearance: none; appearance: none; border: 0; cursor: pointer;
+    padding: 14px 14px;
+    background: var(--rose); color: var(--charcoal);
+    font-family: var(--sans); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+    border-radius: 100px; transition: background 120ms;
+    -webkit-user-select: none; user-select: none;
+  }
+  .actions button:hover { background: var(--deep-rose); color: var(--ivory); }
+  .actions button.secondary { background: rgba(244,237,229,0.08); color: var(--ivory); }
+  .actions button.secondary:hover { background: rgba(244,237,229,0.16); }
+  .actions button[disabled] { opacity: .55; cursor: progress; }
+
+  /* ── Preview ──────────────────────────────────── */
+  .preview { display: flex; flex-wrap: wrap; gap: 56px; align-items: flex-start; padding-top: 18px; }
+  .frame { position: relative; }
+  .frame .tag { position: absolute; top: -26px; left: 0; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(244,237,229,0.5); white-space: nowrap; }
+  .frame .tag b { color: var(--rose); font-weight: 500; }
+
+  /* Post canvases — kept at design size; html2canvas scales up to 1080 on export */
+  .ig {
+    width: 520px; height: 520px; background: var(--bone);
+    border-radius: 4px; overflow: hidden; position: relative;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,0.5);
+  }
+  .snap {
+    width: 296px; height: 526px; background: var(--bone);
+    border-radius: 18px; overflow: hidden; position: relative;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,0.6);
+  }
+
+  /* Shared post structure (copied from the Templates page so output matches) */
+  .post { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .ph-top { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px 0;
+    font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; }
+  .ph-top .mark { font-family: var(--serif); font-size: 16px; font-style: italic; letter-spacing: 0; text-transform: none; }
+  .ph-top .mark i { font-style: italic; }
+
+  .img-area { flex: 1; margin: 14px 22px; position: relative; }
+  .prod-img { position: absolute; inset: 0; margin: auto; max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+  .caption { padding: 12px 22px 22px; }
+  .caption .name { font-family: var(--serif); font-size: 22px; line-height: 1.1; margin: 0 0 4px; }
+  .caption .name em { font-style: italic; }
+  .caption .ar { font-family: var(--arabic); font-size: 14px; color: var(--mocha); margin-bottom: 8px; }
+  .caption .row { display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 1px solid rgba(31,26,24,0.18); padding-top: 8px;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mocha); }
+  .caption .row .price { font-family: var(--serif); font-size: 16px; letter-spacing: 0; text-transform: none; color: var(--charcoal); }
+
+  .snap .ph-top { padding: 22px 22px 0; }
+  .snap .ph-top .mark { font-size: 18px; }
+  .snap .caption { padding: 14px 22px 28px; }
+  .snap .caption .name { font-size: 28px; }
+  .snap .caption .ar { font-size: 15px; }
+  .snap .caption .row .price { font-size: 18px; }
+
+  /* Variant: Bone */
+  .v-bone { background: var(--bone); }
+  .v-bone .ph-top { color: rgba(31,26,24,0.55); }
+  .v-bone .img-area { background: var(--paper); }
+  .v-bone .accent { color: var(--deep-rose); }
+  .v-bone .name em { color: var(--deep-rose); }
+  .v-bone .mark i { color: var(--deep-rose); }
+
+  /* Variant: Charcoal */
+  .v-charcoal { background: var(--charcoal); color: var(--ivory); }
+  .v-charcoal .caption .name { color: var(--ivory); }
+  .v-charcoal .caption .ar { color: var(--rose); }
+  .v-charcoal .caption .row { border-top-color: rgba(244,237,229,0.2); color: rgba(244,237,229,0.5); }
+  .v-charcoal .caption .row .price { color: var(--ivory); }
+  .v-charcoal .ph-top { color: rgba(244,237,229,0.5); }
+  .v-charcoal .ph-top .mark { color: var(--ivory); }
+  .v-charcoal .ph-top .mark i { color: var(--rose); }
+  .v-charcoal .img-area { background: #2A2522; }
+  .v-charcoal .name em { color: var(--rose); }
+
+  /* Variant: Blush */
+  .v-blush { background: var(--blush); }
+  .v-blush .ph-top { color: var(--plum); }
+  .v-blush .ph-top .mark i { color: var(--plum); }
+  .v-blush .img-area { background: var(--rose); }
+  .v-blush .caption .name { color: var(--charcoal); }
+  .v-blush .caption .ar { color: var(--plum); }
+  .v-blush .caption .row { border-top-color: rgba(107,62,72,0.25); color: var(--plum); }
+  .v-blush .name em { color: var(--plum); }
+
+  /* Snap-only hero overlay */
+  .snap .hero-overlay { position: absolute; left: 22px; right: 22px; top: 60px;
+    font-family: var(--serif); font-style: italic; font-size: 38px; line-height: 1.05;
+    pointer-events: none; }
+  .snap .hero-overlay .small { display: block; font-style: normal; font-family: var(--sans);
+    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--mocha); margin-bottom: 10px; }
+  .snap.v-charcoal .hero-overlay { color: var(--ivory); }
+  .snap.v-charcoal .hero-overlay .small { color: var(--rose); }
+  .snap.v-blush .hero-overlay .small { color: var(--plum); }
+
+  /* Pill */
+  .pill { position: absolute; top: 18px; right: 18px;
+    background: var(--charcoal); color: var(--ivory);
+    font-family: var(--sans); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 6px 12px; border-radius: 100px; white-space: nowrap; z-index: 2; }
+  .v-charcoal .pill { background: var(--rose); color: var(--charcoal); }
+  .v-blush .pill { background: var(--plum); color: var(--blush); }
+  .snap .pill { font-size: 9px; padding: 7px 12px; top: 20px; right: 20px; letter-spacing: 0.18em; }
+
+  /* CTA on Snap */
+  .cta { margin: 0 18px 18px; background: var(--ivory); color: var(--charcoal);
+    text-align: center; padding: 14px 0;
+    font-family: var(--sans); font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+    border-radius: 100px; }
+  .v-charcoal .cta { background: var(--rose); color: var(--charcoal); }
+  .v-blush .cta { background: var(--charcoal); color: var(--blush); }
+
+  /* IG: hide pill (IG variant doesn't use it on the canvas itself) */
+  .ig .pill, .ig .hero-overlay, .ig .cta { display: none; }
+
+  /* IG top-right accent badge (Bone direction) */
+  .ig .ph-top .badge { font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 500; }
+  .v-bone .ph-top .badge { color: var(--deep-rose); }
+  .v-charcoal .ph-top .badge { color: var(--rose); }
+  .v-blush .ph-top .badge { color: var(--plum); }
+
+  footer { color: rgba(244,237,229,0.4); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; text-align: center; margin-top: 80px; }
+
+  /* ── Responsive ──────────────────────────────── */
+  @media (max-width: 1100px) {
+    .wrap { padding: 48px 28px 80px; }
+    .app { grid-template-columns: 1fr; gap: 48px; }
+    .preview { padding-top: 16px; gap: 48px; }
+  }
+  @media (max-width: 760px) {
+    .wrap {
+      padding:
+        max(32px, env(safe-area-inset-top))
+        max(18px, env(safe-area-inset-right))
+        max(60px, env(safe-area-inset-bottom))
+        max(18px, env(safe-area-inset-left));
+    }
+    h1 { font-size: 40px; }
+    .eyebrow { font-size: 11px; }
+    .sub { font-size: 15px; }
+    header { margin-bottom: 40px; padding-bottom: 22px; }
+    .topnav { flex-wrap: wrap; gap: 14px; }
+    .controls input[type=text], .controls input[type=number] {
+      font-size: 16px; /* keep ≥16px so iOS Safari doesn't auto-zoom */
+      padding: 12px 12px;
+    }
+    .controls input[dir=rtl] { font-size: 17px; }
+    .actions button { padding: 16px 14px; font-size: 11px; }
+    .preview { flex-direction: column; gap: 64px; align-items: center; }
+    /* Scale the fixed-size canvases down to fit. `zoom` affects layout,
+       so the dashed-line tag and shadows stay aligned. */
+    .ig  { zoom: clamp(0.55, calc((100vw - 36px) / 520), 1); }
+    .snap{ zoom: clamp(0.55, calc((100vw - 36px) / 296 * 0.78), 1); }
+  }
+  @media (max-width: 420px) {
+    h1 { font-size: 34px; }
+    .t-cards { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .t-card { padding: 8px 4px 10px; }
+    .t-card .nm { font-size: 16px; }
+    .t-card .desc { font-size: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Pink Piece · قطعة وردية</div>
+    <h1>Post <em>generator.</em></h1>
+    <p class="sub">Fill in the product, pick a template direction, drop in a photo, then export at full resolution for Instagram posts (1080×1080) and Instagram / Snapchat stories (1080×1920).</p>
+    <nav class="topnav">
+      <a href="Product Posts.html">Templates</a>
+      <a href="Post Generator.html" class="active">Generator</a>
+    </nav>
+  </header>
+
+  <div class="app">
+    <!-- ============== FORM ============== -->
+    <aside class="controls">
+      <fieldset>
+        <legend>Product</legend>
+        <label class="field">Name (EN)
+          <input id="f-name" type="text" value="Mira chain bag">
+        </label>
+        <label class="field">Italic modifier <span class="hint">optional</span>
+          <input id="f-mod" type="text" value="in blush.">
+        </label>
+        <label class="field">Name (AR)
+          <input id="f-name-ar" type="text" value="حقيبة ميرا بسلسلة" dir="rtl">
+        </label>
+        <label class="field">Price <span class="hint">SAR · auto-formats to ر.س</span>
+          <input id="f-price" type="number" value="450" min="0" step="1">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Story copy</legend>
+        <label class="field">Tagline <span class="hint">large italic on the story</span>
+          <input id="f-tag" type="text" value="A little piece, just in.">
+        </label>
+        <label class="field">Eyebrow <span class="hint">small caps line above the tagline</span>
+          <input id="f-eyebrow" type="text" value="Drop No. 24">
+        </label>
+        <label class="field">Pill / badge
+          <input id="f-pill" type="text" value="New this week">
+        </label>
+        <label class="field">CTA button
+          <input id="f-cta" type="text" value="Shop the drop">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Template</legend>
+        <div class="t-cards">
+          <label class="t-card">
+            <input type="radio" name="variant" value="v-bone" checked>
+            <div class="sw" style="background:#F4EDE5"></div>
+            <span class="nm">Bone</span><span class="desc">New</span>
+          </label>
+          <label class="t-card">
+            <input type="radio" name="variant" value="v-charcoal">
+            <div class="sw" style="background:#1F1A18"></div>
+            <span class="nm">Charcoal</span><span class="desc">Editorial</span>
+          </label>
+          <label class="t-card">
+            <input type="radio" name="variant" value="v-blush">
+            <div class="sw" style="background:#FBE3E5"></div>
+            <span class="nm">Blush</span><span class="desc">Soft</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Product photo</legend>
+        <div class="drop" id="drop">
+          <span class="hint">
+            <span class="desktop">Drop image here<br>or <b>click to browse</b></span>
+            <span class="touch"><b>Tap to add</b><br>from photo library</span>
+          </span>
+          <img id="thumb" alt="">
+          <button class="clear" id="drop-clear" type="button">Remove</button>
+          <input type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Export</legend>
+        <div class="actions">
+          <button id="dl-ig">Instagram Post · 1080 × 1080</button>
+          <button id="dl-ig-story" class="secondary">Instagram Story · 1080 × 1920</button>
+          <button id="dl-snap" class="secondary">Snapchat Story · 1080 × 1920</button>
+        </div>
+      </fieldset>
+    </aside>
+
+    <!-- ============== PREVIEW ============== -->
+    <main class="preview">
+      <div class="frame">
+        <div class="tag"><b>IG Post</b> · 1080 × 1080</div>
+        <div class="ig" id="ig">
+          <div class="post v-bone" id="ig-post">
+            <div class="ph-top">
+              <span class="mark">Pink <i>Piece</i></span>
+              <span class="badge" id="ig-badge">New</span>
+            </div>
+            <div class="img-area">
+              <img class="prod-img" id="ig-img" alt="">
+            </div>
+            <div class="caption">
+              <div class="name"><span id="ig-name">Mira chain bag</span> <em id="ig-mod">in blush.</em></div>
+              <div class="ar" id="ig-ar">حقيبة ميرا بسلسلة</div>
+              <div class="row">
+                <span>pinkpiece.sa</span>
+                <span class="price" id="ig-price">٤٥٠ ر.س</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame">
+        <div class="tag"><b>Story</b> · 1080 × 1920</div>
+        <div class="snap" id="snap">
+          <div class="post v-bone" id="snap-post">
+            <div class="ph-top">
+              <span class="mark">Pink <i>Piece</i></span>
+            </div>
+            <div class="pill" id="snap-pill">New this week</div>
+            <div class="hero-overlay">
+              <span class="small" id="snap-eyebrow">— Drop No. 24</span>
+              <span id="snap-tag">A little piece, just in.</span>
+            </div>
+            <div class="img-area" style="margin-top:130px;">
+              <img class="prod-img" id="snap-img" alt="">
+            </div>
+            <div class="caption">
+              <div class="name" id="snap-name">Mira chain bag</div>
+              <div class="ar" id="snap-ar">حقيبة ميرا بسلسلة</div>
+              <div class="row">
+                <span>Tap to shop</span>
+                <span class="price" id="snap-price">٤٥٠ ر.س</span>
+              </div>
+            </div>
+            <div class="cta" id="snap-cta">Shop the drop</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer>Pink Piece · Riyadh · Est. 2009</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const qsa = (sel, el = document) => Array.from(el.querySelectorAll(sel));
+
+  const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+  const toArDigits = (n) => String(n).replace(/\d/g, (d) => AR_DIGITS[+d]);
+  const slug = (s) => (s || 'post').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'post';
+
+  const inputs = ['f-name', 'f-mod', 'f-name-ar', 'f-price', 'f-tag', 'f-eyebrow', 'f-pill', 'f-cta'];
+
+  function render() {
+    const variant = qsa('[name=variant]').find((r) => r.checked).value;
+    $('ig-post').className = 'post ' + variant;
+    $('snap-post').className = 'post ' + variant;
+
+    // :has() fallback for iOS Safari < 15.4
+    qsa('.t-card').forEach((c) => {
+      c.classList.toggle('is-checked', !!c.querySelector('input:checked'));
+    });
+
+    const name = $('f-name').value || 'Product';
+    const mod = $('f-mod').value.trim();
+    const nameAr = $('f-name-ar').value;
+    const price = Number($('f-price').value || 0);
+    const tag = $('f-tag').value;
+    const eyebrow = $('f-eyebrow').value;
+    const pill = $('f-pill').value;
+    const cta = $('f-cta').value;
+
+    $('ig-name').textContent = name;
+    $('ig-mod').textContent = mod ? ' ' + mod : '';
+    $('ig-mod').style.display = mod ? '' : 'none';
+    $('ig-ar').textContent = nameAr;
+    $('ig-ar').style.display = nameAr ? '' : 'none';
+    $('ig-price').textContent = price ? toArDigits(price) + ' ر.س' : '';
+    $('ig-badge').textContent = pill || '';
+    $('ig-badge').style.display = pill ? '' : 'none';
+
+    $('snap-name').textContent = name;
+    $('snap-ar').textContent = nameAr;
+    $('snap-ar').style.display = nameAr ? '' : 'none';
+    $('snap-price').textContent = price ? toArDigits(price) + ' ر.س' : '';
+    $('snap-pill').textContent = pill;
+    $('snap-pill').style.display = pill ? '' : 'none';
+    $('snap-tag').textContent = tag;
+    $('snap-eyebrow').textContent = eyebrow ? '— ' + eyebrow : '';
+    $('snap-eyebrow').style.display = eyebrow ? '' : 'none';
+    $('snap-cta').textContent = cta;
+    $('snap-cta').style.display = cta ? '' : 'none';
+  }
+
+  inputs.forEach((id) => $(id).addEventListener('input', render));
+  qsa('[name=variant]').forEach((r) => r.addEventListener('change', render));
+
+  // ── Drag-drop / file upload ─────────────────────
+  const drop = $('drop');
+  const fileInput = drop.querySelector('input[type=file]');
+  const clearBtn = $('drop-clear');
+
+  drop.addEventListener('click', (e) => {
+    if (e.target === clearBtn) return;
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) loadFile(f);
+    fileInput.value = '';
+  });
+
+  clearBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearImage();
+  });
+
+  let depth = 0;
+  drop.addEventListener('dragenter', (e) => { e.preventDefault(); depth++; drop.classList.add('over'); });
+  drop.addEventListener('dragover', (e) => { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; });
+  drop.addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; drop.classList.remove('over'); } });
+  drop.addEventListener('drop', (e) => {
+    e.preventDefault(); depth = 0; drop.classList.remove('over');
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) loadFile(f);
+  });
+
+  function loadFile(file) {
+    if (!/^image\/(png|jpe?g|webp)$/.test(file.type)) {
+      alert('Please drop a PNG, JPG, or WebP image.');
+      return;
+    }
+    const r = new FileReader();
+    r.onload = () => setImage(r.result);
+    r.readAsDataURL(file);
+  }
+
+  function setImage(url) {
+    for (const id of ['ig-img', 'snap-img', 'thumb']) {
+      const el = $(id);
+      el.src = url;
+      el.style.display = 'block';
+    }
+    drop.classList.add('filled');
+  }
+
+  function clearImage() {
+    for (const id of ['ig-img', 'snap-img', 'thumb']) {
+      const el = $(id);
+      el.removeAttribute('src');
+      el.style.display = 'none';
+    }
+    drop.classList.remove('filled');
+  }
+
+  for (const id of ['ig-img', 'snap-img', 'thumb']) $(id).style.display = 'none';
+
+  // ── Export ──────────────────────────────────────
+  function canvasToBlob(canvas, type) {
+    return new Promise((res) => canvas.toBlob(res, type || 'image/png'));
+  }
+
+  async function exportPng(sourceEl, targetW, filename, btn) {
+    if (typeof html2canvas !== 'function') {
+      alert('Renderer is still loading — try again in a moment.');
+      return;
+    }
+    const origLabel = btn.textContent;
+    btn.textContent = 'Rendering…';
+    btn.disabled = true;
+    // Clear any mobile `zoom` so html2canvas captures the canvas at its
+    // natural design size (520×520 / 296×526); the inline override beats
+    // the media-query rule.
+    const origZoom = sourceEl.style.zoom;
+    sourceEl.style.zoom = '1';
+    try {
+      await document.fonts.ready;
+      const rect = sourceEl.getBoundingClientRect();
+      const scale = targetW / rect.width;
+      const canvas = await html2canvas(sourceEl, {
+        scale,
+        backgroundColor: null,
+        useCORS: true,
+        logging: false,
+        width: rect.width,
+        height: rect.height,
+      });
+      const blob = await canvasToBlob(canvas, 'image/png');
+      if (!blob) throw new Error('Could not encode PNG');
+      const file = new File([blob], filename, { type: 'image/png' });
+
+      // iOS Safari ignores <a download> for blob/data URLs — the Web Share API
+      // is the supported route for saving to Photos / Files / AirDrop. Prefer
+      // it whenever a file share is possible; fall back to a classic download
+      // for desktop browsers.
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: filename });
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return; // user cancelled
+          // any other share failure falls through to the download path
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    } catch (err) {
+      console.error(err);
+      alert('Export failed: ' + (err && err.message ? err.message : 'unknown error'));
+    } finally {
+      sourceEl.style.zoom = origZoom;
+      btn.textContent = origLabel;
+      btn.disabled = false;
+    }
+  }
+
+  $('dl-ig').addEventListener('click', (e) => {
+    exportPng($('ig'), 1080, 'pink-piece-' + slug($('f-name').value) + '-ig-post.png', e.currentTarget);
+  });
+  $('dl-ig-story').addEventListener('click', (e) => {
+    exportPng($('snap'), 1080, 'pink-piece-' + slug($('f-name').value) + '-ig-story.png', e.currentTarget);
+  });
+  $('dl-snap').addEventListener('click', (e) => {
+    exportPng($('snap'), 1080, 'pink-piece-' + slug($('f-name').value) + '-snap.png', e.currentTarget);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
